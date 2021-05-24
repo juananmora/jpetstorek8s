@@ -9,7 +9,7 @@ metadata:
     io.kompose.service: web
   name: web
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       io.kompose.service: web
@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - env:
-        image: juananmora/jpetk8s:latest
+        image: juananmora/jpetk8s:1
         imagePullPolicy: ""
         name: tomcatcompose
         ports:
