@@ -24,6 +24,15 @@ spec:
         io.kompose.service: web
     spec:
       containers:
+      - env:
+        - name: JDBC_DRIVER
+          value: com.mysql.jdbc.Driver
+        - name: JDBC_PASS
+          value: bmcAdm1n
+        - name: JDBC_URL
+          value: jdbc:mysql://mysql/jpetstore
+        - name: JDBC_USER
+          value: root
         image: juananmora/jpetk8s
         imagePullPolicy: ""
         name: tomcatcompose
