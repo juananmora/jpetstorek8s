@@ -16,6 +16,4 @@ spec:
   selector:
     io.kompose.service: web
 status:
-  loadBalancer:
-    ingress:
-      - hostname: localhost
+  loadBalancer:{}
