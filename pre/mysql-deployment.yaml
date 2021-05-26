@@ -13,8 +13,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: mysql
-      app: jpetstore
-      version: v1
   strategy: {}
   template:
     metadata:
