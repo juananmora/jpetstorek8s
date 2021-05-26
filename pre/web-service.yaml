@@ -10,7 +10,7 @@ metadata:
   name: web
 spec:
   ports:
-  - name: "8011"
+  - name: "http-pre"
     port: 8011
     targetPort: 8080
   selector:
