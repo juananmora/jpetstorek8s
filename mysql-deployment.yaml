@@ -12,10 +12,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      annotations:
-        kompose.cmd: D:\docker\kompose\kompose.exe convert
-        kompose.version: 1.21.0 (992df58d8)
-      creationTimestamp: null
       labels:
         io.kompose.service: mysql
     spec:
@@ -24,13 +20,11 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           value: bmcAdm1n
         image: juananmora/mysql
-        imagePullPolicy: ""
+        imagePullPolicy: "Always"
         name: mysqlcompose
         ports:
         - containerPort: 3306
-        resources: {}
       hostname: mysql
       restartPolicy: Always
       serviceAccountName: ""
-      volumes: null
 status: {}
