@@ -1,0 +1,341 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: D:\docker\kompose\kompose.exe convert
+    kompose.version: 1.21.0 (992df58d8)
+    kubectl.kubernetes.io/default-container: tomcatcompose
+    kubectl.kubernetes.io/default-logs-container: tomcatcompose
+    prometheus.io/path: /stats/prometheus
+    prometheus.io/port: "15020"
+    prometheus.io/scrape: "true"
+    sidecar.istio.io/status: '{"initContainers":["istio-init"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-data","istio-podinfo","istiod-ca-cert"],"imagePullSecrets":null}'
+  creationTimestamp: "2021-07-05T07:15:34Z"
+  generateName: web-779675cf8-
+  labels:
+    io.kompose.service: web
+    istio.io/rev: default
+    pod-template-hash: 779675cf8
+    security.istio.io/tlsMode: istio
+    service.istio.io/canonical-name: web
+    service.istio.io/canonical-revision: latest
+  name: web-779675cf8-bkwx4
+  namespace: jpetstorek8s-pre
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: web-779675cf8
+    uid: 23244362-9de4-488c-9060-8749b51a21ed
+  resourceVersion: "859923"
+  selfLink: /api/v1/namespaces/jpetstorek8s-pre/pods/web-779675cf8-bkwx4
+  uid: 8a159936-2a7f-409e-ba65-87c8672b9123
+spec:
+  containers:
+  - image: juananmora/jpetk8s:5
+    imagePullPolicy: IfNotPresent
+    name: tomcatcompose
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-zg29g
+      readOnly: true
+  - args:
+    - proxy
+    - sidecar
+    - --domain
+    - $(POD_NAMESPACE).svc.cluster.local
+    - --serviceCluster
+    - web.jpetstorek8s-pre
+    - --proxyLogLevel=warning
+    - --proxyComponentLogLevel=misc:error
+    - --log_output_level=default:info
+    - --concurrency
+    - "2"
+    env:
+    - name: JWT_POLICY
+      value: first-party-jwt
+    - name: PILOT_CERT_PROVIDER
+      value: istiod
+    - name: CA_ADDR
+      value: istiod.istio-system.svc:15012
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: INSTANCE_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: SERVICE_ACCOUNT
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.serviceAccountName
+    - name: HOST_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.hostIP
+    - name: CANONICAL_SERVICE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels['service.istio.io/canonical-name']
+    - name: CANONICAL_REVISION
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels['service.istio.io/canonical-revision']
+    - name: PROXY_CONFIG
+      value: |
+        {}
+    - name: ISTIO_META_POD_PORTS
+      value: |-
+        [
+            {"containerPort":8080,"protocol":"TCP"}
+        ]
+    - name: ISTIO_META_APP_CONTAINERS
+      value: tomcatcompose
+    - name: ISTIO_META_CLUSTER_ID
+      value: Kubernetes
+    - name: ISTIO_META_INTERCEPTION_MODE
+      value: REDIRECT
+    - name: ISTIO_METAJSON_ANNOTATIONS
+      value: |
+        {"kompose.cmd":"D:\\docker\\kompose\\kompose.exe convert","kompose.version":"1.21.0 (992df58d8)"}
+    - name: ISTIO_META_WORKLOAD_NAME
+      value: web
+    - name: ISTIO_META_OWNER
+      value: kubernetes://apis/apps/v1/namespaces/jpetstorek8s-pre/deployments/web
+    - name: ISTIO_META_MESH_ID
+      value: cluster.local
+    - name: TRUST_DOMAIN
+      value: cluster.local
+    image: docker.io/istio/proxyv2:1.10.0
+    imagePullPolicy: IfNotPresent
+    name: istio-proxy
+    ports:
+    - containerPort: 15090
+      name: http-envoy-prom
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 30
+      httpGet:
+        path: /healthz/ready
+        port: 15021
+        scheme: HTTP
+      initialDelaySeconds: 1
+      periodSeconds: 2
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 40Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1337
+      runAsNonRoot: true
+      runAsUser: 1337
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/istio
+      name: istiod-ca-cert
+    - mountPath: /var/lib/istio/data
+      name: istio-data
+    - mountPath: /etc/istio/proxy
+      name: istio-envoy
+    - mountPath: /etc/istio/pod
+      name: istio-podinfo
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-zg29g
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  initContainers:
+  - args:
+    - istio-iptables
+    - -p
+    - "15001"
+    - -z
+    - "15006"
+    - -u
+    - "1337"
+    - -m
+    - REDIRECT
+    - -i
+    - '*'
+    - -x
+    - ""
+    - -b
+    - '*'
+    - -d
+    - 15090,15021,15020
+    image: docker.io/istio/proxyv2:1.10.0
+    imagePullPolicy: IfNotPresent
+    name: istio-init
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 40Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-zg29g
+      readOnly: true
+  nodeName: docker-desktop
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - emptyDir:
+      medium: Memory
+    name: istio-envoy
+  - emptyDir: {}
+    name: istio-data
+  - downwardAPI:
+      defaultMode: 420
+      items:
+      - fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels
+        path: labels
+      - fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.annotations
+        path: annotations
+      - path: cpu-limit
+        resourceFieldRef:
+          containerName: istio-proxy
+          divisor: 1m
+          resource: limits.cpu
+      - path: cpu-request
+        resourceFieldRef:
+          containerName: istio-proxy
+          divisor: 1m
+          resource: requests.cpu
+    name: istio-podinfo
+  - configMap:
+      defaultMode: 420
+      name: istio-ca-root-cert
+    name: istiod-ca-cert
+  - name: default-token-zg29g
+    secret:
+      defaultMode: 420
+      secretName: default-token-zg29g
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2021-07-05T07:15:38Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2021-07-13T05:38:21Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2021-07-13T05:38:21Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2021-07-05T07:15:34Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://3c242ee674926174d37c4d56da808df6b3eaf89fc946827b06807b6ef7b927f6
+    image: istio/proxyv2:1.10.0
+    imageID: docker-pullable://istio/proxyv2@sha256:88c6c693e67a0f2492191a0e7d8020ddc85603bfc704f252655cb9eb5eeb3f58
+    lastState: {}
+    name: istio-proxy
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2021-07-13T05:37:47Z"
+  - containerID: docker://167204c9963c7f7f07cae78803324301c4d1a3ff6b36c18fb3a72fac102e9720
+    image: juananmora/jpetk8s:5
+    imageID: docker-pullable://juananmora/jpetk8s@sha256:2fa9beffcdc3fd2b4901508cfdd8144d8de518b12691fd868fdfc4ded0399cd1
+    lastState: {}
+    name: tomcatcompose
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2021-07-13T05:37:46Z"
+  hostIP: 192.168.65.4
+  initContainerStatuses:
+  - containerID: docker://938c63a5103b2b91a8f84682204af19b209e9f6d7d283b073bfdf0cc399af70d
+    image: istio/proxyv2:1.10.0
+    imageID: docker-pullable://istio/proxyv2@sha256:88c6c693e67a0f2492191a0e7d8020ddc85603bfc704f252655cb9eb5eeb3f58
+    lastState: {}
+    name: istio-init
+    ready: true
+    restartCount: 1
+    state:
+      terminated:
+        containerID: docker://938c63a5103b2b91a8f84682204af19b209e9f6d7d283b073bfdf0cc399af70d
+        exitCode: 0
+        finishedAt: "2021-07-13T05:37:43Z"
+        reason: Completed
+        startedAt: "2021-07-13T05:37:42Z"
+  phase: Running
+  podIP: 10.1.5.186
+  podIPs:
+  - ip: 10.1.5.186
+  qosClass: Burstable
+  startTime: "2021-07-05T07:15:34Z"
