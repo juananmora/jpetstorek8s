@@ -26,4 +26,5 @@ spec:
       restartPolicy: Always
       serviceAccountName: ""
 status: {}
-image: 3
+metadata:
+  image: 3
