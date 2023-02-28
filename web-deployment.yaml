@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - env:
-        image: juananmora/jpetk8s:7
+        image: juananmora/jpetk8s:5
         imagePullPolicy: "Always"
         name: tomcatcompose
         ports:
