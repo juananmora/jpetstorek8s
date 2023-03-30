@@ -8,10 +8,9 @@ metadata:
   labels:
     io.kompose.service: web
   name: web
-  namespace: pro
 spec:
   ports:
-  - name: "8011"
+  - name: "http-pre"
     port: 8012
     targetPort: 8080
   selector:
